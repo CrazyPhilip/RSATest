@@ -103,6 +103,7 @@ namespace RSATest
             //
             //mainViewModel.CipherText = RSAEncrypt(mainViewModel.ClearText, xml);
             mainViewModel.CipherText = Encrypt(mainViewModel.ClearText);
+
         }
 
         /// <summary>
