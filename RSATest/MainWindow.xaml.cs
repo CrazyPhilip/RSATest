@@ -96,14 +96,7 @@ namespace RSATest
         /// <param name="e"></param>
         private void EncryptButton_Click(object sender, RoutedEventArgs e)
         {
-            //string n = Convert.ToBase64String(Encoding.Default.GetBytes(mainViewModel.NumberN));
-            //string ee = Convert.ToBase64String(Encoding.Default.GetBytes(mainViewModel.NumberE));
-            //
-            //string xml = "<RSAKeyValue><Modulus>" + n + "</Modulus><Exponent>AQAB</Exponent></RSAKeyValue>";
-            //
-            //mainViewModel.CipherText = RSAEncrypt(mainViewModel.ClearText, xml);
             mainViewModel.CipherText = Encrypt(mainViewModel.ClearText);
-
         }
 
         /// <summary>
@@ -113,26 +106,6 @@ namespace RSATest
         /// <param name="e"></param>
         private void DecryptButton_Click(object sender, RoutedEventArgs e)
         {
-            /*
-            byte[] bytes = Encoding.Default.GetBytes(mainViewModel.NumberD);
-            string baseKey = Convert.ToBase64String(bytes);
-
-            string p = Convert.ToBase64String(Encoding.Default.GetBytes(mainViewModel.PrimeNumP));
-            string q = Convert.ToBase64String(Encoding.Default.GetBytes(mainViewModel.PrimeNumQ));
-            string n = Convert.ToBase64String(Encoding.Default.GetBytes(mainViewModel.NumberN));
-            string phi = Convert.ToBase64String(Encoding.Default.GetBytes(mainViewModel.NumberPHI));
-            string ee = Convert.ToBase64String(Encoding.Default.GetBytes(mainViewModel.NumberE));
-            string d = Convert.ToBase64String(Encoding.Default.GetBytes(mainViewModel.NumberD));
-            BigInteger _dp = BigInteger.Parse(mainViewModel.NumberD) % (BigInteger.Parse(mainViewModel.PrimeNumP) - 1);
-            BigInteger _dq = BigInteger.Parse(mainViewModel.NumberD) % (BigInteger.Parse(mainViewModel.PrimeNumQ) - 1);
-            string dp = Convert.ToBase64String(Encoding.Default.GetBytes(_dp.ToString()));
-            string dq = Convert.ToBase64String(Encoding.Default.GetBytes(_dq.ToString()));
-
-            string xml = "<RSAKeyValue><Modulus>" + n + "</Modulus><Exponent>AQAB</Exponent><P>" +
-                p + "</P><Q>" + q + "</Q><DP>" + dp + "</DP><DQ>" + dq + "</DQ><InverseQ>" + phi + "</InverseQ><D>" + d + "</D></RSAKeyValue>";
-
-            mainViewModel.ClearText = RSADecrypt(mainViewModel.CipherText, xml);
-            */
             mainViewModel.ClearText = Decrypt(mainViewModel.ClearText);
         }
 
@@ -524,7 +497,7 @@ namespace RSATest
             return results;
         }
 
-        // Convert ciphered text into plain text.
+        // 解密
         private byte[] DecipheredText(BigInteger[] data, BigInteger d, BigInteger n)
         {
             int length = data.Length;
@@ -537,7 +510,7 @@ namespace RSATest
             {
                 temp = data[i];
 
-                // If whitespace, newline or carriage return.
+                // 检测空格、新行、回车
                 if (temp >= 199 && temp <= 201)
                 {
                     results[i] = (byte)temp;
