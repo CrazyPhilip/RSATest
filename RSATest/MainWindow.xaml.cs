@@ -24,6 +24,7 @@ namespace RSATest
     {
         MainViewModel mainViewModel = new MainViewModel();
         private BigInteger[] _cipheredText;
+        private BigInteger r1, r2, _p, _q, _n, _phi, _e, _d;
 
         public MainWindow()
         {
@@ -63,30 +64,28 @@ namespace RSATest
         /// <param name="e"></param>
         private void ProducePrivateKeyBtn_Click(object sender, RoutedEventArgs e)
         {
-            mainViewModel.PrimeNumP = ProducePrimeNumber(mainViewModel.RandomNumber1);
-            mainViewModel.PrimeNumQ = ProducePrimeNumber(mainViewModel.RandomNumber2);
+            r1 = BigInteger.Parse(mainViewModel.RandomNumber1);
+            r2 = BigInteger.Parse(mainViewModel.RandomNumber2);
 
-            BigInteger p = BigInteger.Parse(mainViewModel.PrimeNumP);
-            BigInteger q = BigInteger.Parse(mainViewModel.PrimeNumQ);
+            _p = ProducePrimeNumber(r1);
+            _q = ProducePrimeNumber(r2);
 
-            mainViewModel.NumberN = GetN(p, q);
-            mainViewModel.NumberPHI = GetPHI(p, q);
+            _n = GetN(_p, _q);
+            _phi = GetPHI(_p, _q);
 
-            BigInteger _e = GetE(mainViewModel.NumberPHI);
-            //BigInteger d = (1 / _e) % BigInteger.Parse(mainViewModel.NumberPHI);
-            BigInteger d = BigInteger.Zero;
-            BigInteger y = BigInteger.Zero;
+            _e = GetE(_phi);
 
-            exgcd(_e, BigInteger.Parse(mainViewModel.NumberPHI), out d, out y);
+            Exgcd(_e, _phi, out _d, out BigInteger y);
 
-            _e = _e < 0 ? _e + BigInteger.Parse(mainViewModel.NumberPHI) : _e;
-            d = d < 0 ? d + BigInteger.Parse(mainViewModel.NumberPHI) : d;
+            _d = _d < 0 ? _d + _phi : _d;
 
+            mainViewModel.PrimeNumP = _p.ToString();
+            mainViewModel.PrimeNumQ = _q.ToString();
+            mainViewModel.NumberN = _n.ToString();
+            mainViewModel.NumberPHI = _phi.ToString();
             mainViewModel.NumberE = _e.ToString();
-            mainViewModel.NumberD = d.ToString();
+            mainViewModel.NumberD = _d.ToString();
 
-            RSACryptoServiceProvider rsa = new RSACryptoServiceProvider();
-            
         }
 
         /// <summary>
@@ -106,7 +105,7 @@ namespace RSATest
         /// <param name="e"></param>
         private void DecryptButton_Click(object sender, RoutedEventArgs e)
         {
-            mainViewModel.ClearText = Decrypt(mainViewModel.ClearText);
+            mainViewModel.ClearText = Decrypt(mainViewModel.CipherText);
         }
 
         /// <summary>
@@ -140,18 +139,25 @@ namespace RSATest
         /// </summary>
         /// <param name="number"></param>
         /// <returns></returns>
-        private string ProducePrimeNumber(string number)
+        private BigInteger ProducePrimeNumber(BigInteger number)
         {
-            string primeNumber = "";
-            BigInteger bigInteger = BigInteger.Parse(number);
-
-            while (!IsProbablePrime(bigInteger))
+            try
             {
-                bigInteger += 1;
-            }
+                BigInteger primeNumber;
 
-            primeNumber = bigInteger.ToString();
-            return primeNumber;
+                while (!IsProbablePrime(number))
+                {
+                    number += 1;
+                }
+
+                primeNumber = number;
+                return primeNumber;
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine(ex);
+                throw;
+            }
         }
 
         /// <summary>
@@ -215,36 +221,15 @@ namespace RSATest
         /// <param name="p"></param>
         /// <param name="q"></param>
         /// <returns></returns>
-        private string GetN(string p, string q)
+        private BigInteger GetN(BigInteger p, BigInteger q)
         {
             try
             {
-                BigInteger num1 = BigInteger.Parse(p);
-                BigInteger num2 = BigInteger.Parse(q);
-
-                return (num1 * num2).ToString();
+                return (p * q);
             }
             catch
             {
-                return "";
-            }
-        }
-
-        /// <summary>
-        /// 求N
-        /// </summary>
-        /// <param name="p"></param>
-        /// <param name="q"></param>
-        /// <returns></returns>
-        private string GetN(BigInteger p, BigInteger q)
-        {
-            try
-            {
-                return (p * q).ToString();
-            }
-            catch
-            {
-                return "";
+                return 0;
             }
         }
 
@@ -254,36 +239,15 @@ namespace RSATest
         /// <param name="p"></param>
         /// <param name="q"></param>
         /// <returns></returns>
-        private string GetPHI(string p, string q)
+        private BigInteger GetPHI(BigInteger p, BigInteger q)
         {
             try
             {
-                BigInteger num1 = BigInteger.Parse(p) - 1;
-                BigInteger num2 = BigInteger.Parse(q) - 1;
-
-                return (num1 * num2).ToString();
+                return ((p - 1) * (q - 1));
             }
             catch
             {
-                return "";
-            }
-        }
-
-        /// <summary>
-        /// 求PHI
-        /// </summary>
-        /// <param name="p"></param>
-        /// <param name="q"></param>
-        /// <returns></returns>
-        private string GetPHI(BigInteger p, BigInteger q)
-        {
-            try
-            {
-                return ((p - 1) * (q - 1)).ToString();
-            }
-            catch
-            {
-                return "";
+                return 0;
             }
         }
 
@@ -292,28 +256,20 @@ namespace RSATest
         /// </summary>
         /// <param name="p"></param>
         /// <returns></returns>
-        private BigInteger GetE(string p)
+        private BigInteger GetE(BigInteger phi)
         {
-            BigInteger phi = BigInteger.Parse(p);
-
             BigInteger e = phi;
-            BigInteger d = phi;
 
             while (e > 2)
             {
                 e -= 1;
-                if (gcd(phi, e) == 1)
+                if (Gcd(phi, e) == 1)
                 {
                     break;
                 }
             }
 
-            return e;        
-        }
-
-        private BigInteger GetD(string e, string phi)
-        {
-            return 0;
+            return e;
         }
 
         /// <summary>
@@ -322,9 +278,9 @@ namespace RSATest
         /// <param name="a"></param>
         /// <param name="b"></param>
         /// <returns></returns>
-        private BigInteger gcd(BigInteger a, BigInteger b)
+        private BigInteger Gcd(BigInteger a, BigInteger b)
         {
-            while (b !=0 )
+            while (b != 0)
             {
                 BigInteger t = b;
                 b = a % b;
@@ -341,7 +297,7 @@ namespace RSATest
         /// <param name="x"></param>
         /// <param name="y"></param>
         /// <returns></returns>
-        public BigInteger exgcd(BigInteger a, BigInteger b, out BigInteger x, out BigInteger y)
+        public BigInteger Exgcd(BigInteger a, BigInteger b, out BigInteger x, out BigInteger y)
         {
             if (b == 0)
             {//推理1，终止条件
@@ -350,7 +306,7 @@ namespace RSATest
                 return a;
             }
 
-            BigInteger r = exgcd(b, a % b, out x, out y);
+            BigInteger r = Exgcd(b, a % b, out x, out y);
 
             //先得到更底层的x2,y2,再根据计算好的x2,y2计算x1，y1。
             //推理2，递推关系
@@ -359,54 +315,6 @@ namespace RSATest
             y = x - (a / b) * y;
             x = t;
             return r;
-        }
-
-        /// <summary>
-        /// 加密
-        /// </summary>
-        /// <param name="content"></param>
-        /// <param name="publicKey"></param>
-        /// <returns></returns>
-        public string RSAEncrypt(string content, string publicKey)
-        {
-            try
-            {
-                RSACryptoServiceProvider rsa = new RSACryptoServiceProvider();
-                byte[] cipherbytes;
-
-                rsa.FromXmlString(publicKey);
-                cipherbytes = rsa.Encrypt(Encoding.UTF8.GetBytes(content), false);
-                return Convert.ToBase64String(cipherbytes);
-            }
-            catch (Exception ex)
-            {
-                Console.WriteLine(ex);
-                return "";
-            }
-        }
-
-        /// <summary>
-        /// 解密
-        /// </summary>
-        /// <param name="s"></param>
-        /// <param name="privateKey"></param>
-        /// <returns></returns>
-        public string RSADecrypt(string s, string privateKey)
-        {
-            try
-            {
-                RSACryptoServiceProvider rsa = new RSACryptoServiceProvider();
-                byte[] cipherbytes;
-
-                rsa.FromXmlString(privateKey);
-                cipherbytes = rsa.Decrypt(Convert.FromBase64String(s), false);
-                return Encoding.UTF8.GetString(cipherbytes);
-            }
-            catch (Exception ex)
-            {
-                Console.WriteLine(ex);
-                return "";
-            }
         }
 
         #region
@@ -490,7 +398,7 @@ namespace RSATest
                 }
 
 
-                temp = quick(temp, e, n);
+                temp = QuickMod(temp, e, n);
                 results[i] = temp;
             }
 
@@ -527,7 +435,7 @@ namespace RSATest
             return results;
         }
 
-        BigInteger quick(BigInteger a, BigInteger b, BigInteger c)
+        BigInteger QuickMod(BigInteger a, BigInteger b, BigInteger c)
         {
             BigInteger A = 1;   //结果的保存，就是An，初始化一下        
             BigInteger T = a % c;     //首先计算T0的值，用于Tn的递推          
@@ -546,8 +454,6 @@ namespace RSATest
 
         public string Encrypt(string message)
         {
-            BigInteger _e = BigInteger.Parse(mainViewModel.NumberE);
-            BigInteger _n = BigInteger.Parse(mainViewModel.NumberN);
             byte[] arr = StringToByteArray(message);
             _cipheredText = CipheredText(arr, _e, _n);
             var stringBuilder = new StringBuilder();
@@ -563,9 +469,6 @@ namespace RSATest
 
         public string Decrypt(string message)
         {
-            BigInteger _d = BigInteger.Parse(mainViewModel.NumberD);
-            BigInteger _n = BigInteger.Parse(mainViewModel.NumberN);
-
             char[] temp = message.ToCharArray();
             byte[] plainText = DecipheredText(_cipheredText, _d, _n);
             string decipheredText = ByteArrayToString(plainText);

@@ -99,7 +99,7 @@
             <Button Grid.Row="1" Grid.Column="1" x:Name="DecryptButton" Content="《=解密" Click="DecryptButton_Click"/>
             <Button Grid.Row="2" Grid.Column="1" x:Name="ClearButton2" Content="清空" Click="ClearButton2_Click"/>
 
-            <Label Grid.Row="0" Grid.Column="2" Content="明文"/>
+            <Label Grid.Row="0" Grid.Column="2" Content="密文"/>
             <TextBox Grid.Row="1" Grid.Column="2" Grid.RowSpan="2" x:Name="CipherTextBox" Text="{Binding CipherText}" TextWrapping="Wrap"/>
         </Grid>
 
