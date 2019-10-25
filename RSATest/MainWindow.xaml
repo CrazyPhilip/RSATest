@@ -5,12 +5,20 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:RSATest"
         mc:Ignorable="d"
-        Title="RSA" Height="600" Width="800" ResizeMode="NoResize">
+        Title="RSA" Height="900" Width="1200" ResizeMode="NoResize">
 
     <Window.Resources>
         <Style TargetType="TextBox">
-            <Setter Property="Height" Value="60"/>
+            <Setter Property="Height" Value="100"/>
             <Setter Property="TextWrapping" Value="Wrap"/>
+            <Setter Property="FontSize" Value="18"/>
+        </Style>
+        <Style TargetType="Button">
+            <Setter Property="Height" Value="40"/>
+            <Setter Property="FontSize" Value="18"/>
+        </Style>
+        <Style TargetType="Label">
+            <Setter Property="FontSize" Value="18"/>
         </Style>
     </Window.Resources>
     
@@ -32,7 +40,7 @@
 
         <StackPanel Grid.Row="0" Grid.Column="0" Orientation="Vertical">
             <Button x:Name="NewRandomCountBtn" Content="生成随机数" Click="NewRandomCountBtn_Click"/>
-            <TextBox x:Name="RandomCountTextBox" Text="{Binding RandomCount}" Height="30" Width="100"/>
+            <TextBox x:Name="RandomCountTextBox" Text="{Binding RandomCount}" Height="30" Width="100" FontSize="18"/>
         </StackPanel>
 
         <StackPanel Grid.Row="0" Grid.Column="1" Orientation="Vertical">
@@ -93,14 +101,14 @@
             </Grid.RowDefinitions>
 
             <Label Grid.Row="0" Grid.Column="0" Content="明文"/>
-            <TextBox Grid.Row="1" Grid.Column="0" Grid.RowSpan="2" x:Name="ClearTextBox" Text="{Binding ClearText}" TextWrapping="Wrap"/>
+            <TextBox Grid.Row="1" Grid.Column="0" Grid.RowSpan="2" x:Name="ClearTextBox" Text="{Binding ClearText}" TextWrapping="Wrap" FontSize="18"/>
 
             <Button Grid.Row="0" Grid.Column="1" x:Name="EncryptButton" Content="加密=》" Click="EncryptButton_Click"/>
             <Button Grid.Row="1" Grid.Column="1" x:Name="DecryptButton" Content="《=解密" Click="DecryptButton_Click"/>
             <Button Grid.Row="2" Grid.Column="1" x:Name="ClearButton2" Content="清空" Click="ClearButton2_Click"/>
 
             <Label Grid.Row="0" Grid.Column="2" Content="密文"/>
-            <TextBox Grid.Row="1" Grid.Column="2" Grid.RowSpan="2" x:Name="CipherTextBox" Text="{Binding CipherText}" TextWrapping="Wrap"/>
+            <TextBox Grid.Row="1" Grid.Column="2" Grid.RowSpan="2" x:Name="CipherTextBox" Text="{Binding CipherText}" TextWrapping="Wrap" FontSize="18"/>
         </Grid>
 
     </Grid>
